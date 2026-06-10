@@ -40,7 +40,10 @@ def apply_style() -> None:
         f"""
         <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-        html, body, [class*="css"] {{ font-family: Inter, sans-serif; }}
+        html, body, [class*="css"] {{
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            color: {INK};
+        }}
         sub, sup {{
             font-size: 0.68em;
             line-height: 0;
@@ -50,20 +53,21 @@ def apply_style() -> None:
         sub {{ bottom: -0.28em; }}
         sup {{ top: -0.46em; }}
         .stApp {{ background: {BG}; }}
-        .block-container {{ padding-top: 1.55rem; padding-bottom: 3rem; max-width: 1320px; }}
+        .block-container {{ padding-top: 1.05rem; padding-bottom: 2.4rem; max-width: 1320px; }}
+        div[data-testid="stVerticalBlock"] {{ gap: 0.58rem; }}
         .hero {{
             background: linear-gradient(135deg, #173F45 0%, #2F6F73 52%, #5EA7A3 100%);
             color: white;
-            padding: 1.75rem 2.1rem;
+            padding: 1.28rem 1.72rem;
             border-radius: 10px;
-            margin-bottom: 1.15rem;
-            box-shadow: 0 18px 45px rgba(24, 66, 72, 0.18);
+            margin-bottom: 0.62rem;
+            box-shadow: 0 12px 30px rgba(24, 66, 72, 0.15);
         }}
         .hero h1 {{
             color: #FFFFFF !important;
-            font-size: 2.08rem;
-            line-height: 1.12;
-            margin: 0 0 0.42rem 0;
+            font-size: 1.92rem;
+            line-height: 1.1;
+            margin: 0 0 0.32rem 0;
             font-weight: 800;
             letter-spacing: 0;
         }}
@@ -71,8 +75,8 @@ def apply_style() -> None:
         .hero p {{
             margin: 0;
             color: rgba(255,255,255,0.92) !important;
-            font-size: 0.98rem;
-            line-height: 1.5;
+            font-size: 0.94rem;
+            line-height: 1.42;
             max-width: 920px;
         }}
         .hero p sub, .hero p sup {{ color: rgba(255,255,255,0.92) !important; }}
@@ -88,13 +92,13 @@ def apply_style() -> None:
             border: 1px solid rgba(36,50,63,0.08);
             border-left: 4px solid {PRIMARY};
             border-radius: 8px;
-            padding: 0.78rem 0.95rem;
-            min-height: 92px;
-            box-shadow: 0 8px 24px rgba(36,50,63,0.05);
+            padding: 0.66rem 0.88rem;
+            min-height: 78px;
+            box-shadow: 0 6px 18px rgba(36,50,63,0.045);
         }}
-        .metric-label {{ color: {MUTED}; font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; line-height: 1.25; }}
-        .metric-value {{ color: {INK}; font-size: 1.46rem; font-weight: 800; margin-top: 0.22rem; line-height: 1.14; }}
-        .small-note {{ color: {MUTED}; font-size: 0.82rem; line-height: 1.42; margin-top: 0.1rem; }}
+        .metric-label {{ color: {MUTED}; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.035em; line-height: 1.22; }}
+        .metric-value {{ color: {INK}; font-size: 1.34rem; font-weight: 800; margin-top: 0.16rem; line-height: 1.12; }}
+        .small-note {{ color: {MUTED}; font-size: 0.8rem; line-height: 1.38; margin: 0.04rem 0 0.1rem 0; }}
         .result-box {{
             background: white;
             border: 1px solid rgba(36,50,63,0.08);
@@ -121,13 +125,13 @@ def apply_style() -> None:
         .result-unit {{ color: {MUTED}; font-size: 0.96rem; font-weight: 700; line-height: 1.25; margin: 0.22rem 0 0.55rem 0; }}
         .input-label {{
             color: {INK};
-            font-size: 0.84rem;
-            font-weight: 650;
-            line-height: 1.22;
-            min-height: 1.65rem;
+            font-size: 0.82rem;
+            font-weight: 620;
+            line-height: 1.18;
+            min-height: 1.18rem;
             display: flex;
             align-items: flex-end;
-            margin: 0.1rem 0 0.28rem 0;
+            margin: 0.02rem 0 0.18rem 0;
         }}
         .input-label sub, .input-label sup {{
             font-size: 0.72em;
@@ -143,9 +147,9 @@ def apply_style() -> None:
         .pill-high {{ background: #FBECEA; color: #A63C32; }}
         .pill-caution {{ background: #FFF4D7; color: #8B6B1D; }}
         div[data-testid="stMetricValue"] {{ font-weight: 800; color: {INK}; }}
-        h2 {{ color: {INK}; font-size: 1.28rem !important; line-height: 1.25 !important; padding-bottom: 0.1rem !important; }}
-        h3 {{ color: {INK}; font-size: 1.02rem !important; line-height: 1.28 !important; margin-top: 0.72rem !important; }}
-        h4 {{ color: {INK}; font-size: 0.94rem !important; line-height: 1.22 !important; margin: 0.62rem 0 0.28rem 0 !important; }}
+        h2 {{ color: {INK}; font-size: 1.2rem !important; line-height: 1.22 !important; padding-bottom: 0 !important; margin: 0.34rem 0 0.08rem 0 !important; }}
+        h3 {{ color: {INK}; font-size: 1rem !important; line-height: 1.25 !important; margin-top: 0.48rem !important; }}
+        h4 {{ color: {INK}; font-size: 0.95rem !important; line-height: 1.2 !important; margin: 0.46rem 0 0.16rem 0 !important; }}
         label, .stNumberInput label, .stFileUploader label {{
             color: {INK} !important;
             font-size: 0.82rem !important;
@@ -156,8 +160,8 @@ def apply_style() -> None:
             align-items: flex-end !important;
         }}
         .stNumberInput input {{
-            font-size: 0.9rem !important;
-            min-height: 2.24rem;
+            font-size: 0.92rem !important;
+            min-height: 2.18rem;
         }}
         div[data-testid="stCaptionContainer"] {{
             color: {MUTED};
@@ -172,11 +176,11 @@ def apply_style() -> None:
             background: white;
             border: 1px solid rgba(36,50,63,0.08);
             border-radius: 8px;
-            padding: 0.82rem 0.96rem 1rem 0.96rem;
-            box-shadow: 0 8px 24px rgba(36,50,63,0.05);
+            padding: 0.72rem 0.92rem 0.9rem 0.92rem;
+            box-shadow: 0 6px 18px rgba(36,50,63,0.045);
         }}
         div[data-testid="stHorizontalBlock"] {{
-            gap: 0.95rem;
+            gap: 0.78rem;
         }}
         .stButton > button, .stDownloadButton > button {{
             border-radius: 8px;
@@ -193,8 +197,8 @@ def apply_style() -> None:
         }}
         @media (max-width: 760px) {{
             .block-container {{ padding-top: 1rem; }}
-            .hero {{ padding: 1.35rem 1.25rem; }}
-            .hero h1 {{ font-size: 1.65rem; }}
+            .hero {{ padding: 1.12rem 1.1rem; margin-bottom: 0.55rem; }}
+            .hero h1 {{ font-size: 1.52rem; }}
             .metric-value {{ font-size: 1.28rem; }}
             .result-value {{ font-size: 2.15rem; }}
             .result-box {{ grid-template-columns: 1fr; gap: 1rem; }}

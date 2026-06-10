@@ -125,13 +125,13 @@ def apply_style() -> None:
         .result-unit {{ color: {MUTED}; font-size: 0.96rem; font-weight: 700; line-height: 1.25; margin: 0.22rem 0 0.55rem 0; }}
         .input-label {{
             color: {INK};
-            font-size: 0.82rem;
-            font-weight: 620;
-            line-height: 1.18;
-            min-height: 1.18rem;
+            font-size: 0.9rem;
+            font-weight: 700;
+            line-height: 1.16;
+            min-height: 1.05rem;
             display: flex;
             align-items: flex-end;
-            margin: 0.02rem 0 0.18rem 0;
+            margin: 0.02rem 0 0.08rem 0;
         }}
         .input-label sub, .input-label sup {{
             font-size: 0.72em;
@@ -162,6 +162,15 @@ def apply_style() -> None:
         .stNumberInput input {{
             font-size: 0.92rem !important;
             min-height: 2.18rem;
+        }}
+        div[data-testid="stNumberInput"] label {{
+            display: none !important;
+            min-height: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }}
+        div[data-testid="stNumberInput"] {{
+            margin-top: -0.45rem;
         }}
         div[data-testid="stCaptionContainer"] {{
             color: {MUTED};

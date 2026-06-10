@@ -119,6 +119,19 @@ def apply_style() -> None:
         .result-message-warn {{ background: #FFF4D7; color: #735817; }}
         .result-value {{ font-size: 2.55rem; color: {PRIMARY}; font-weight: 800; line-height: 1; margin-top: 0.22rem; }}
         .result-unit {{ color: {MUTED}; font-size: 0.96rem; font-weight: 700; line-height: 1.25; margin: 0.22rem 0 0.55rem 0; }}
+        .input-label {{
+            color: {INK};
+            font-size: 0.84rem;
+            font-weight: 650;
+            line-height: 1.22;
+            min-height: 1.65rem;
+            display: flex;
+            align-items: flex-end;
+            margin: 0.1rem 0 0.28rem 0;
+        }}
+        .input-label sub, .input-label sup {{
+            font-size: 0.72em;
+        }}
         .status-pill {{
             display: inline-block;
             padding: 0.32rem 0.62rem;
@@ -185,6 +198,7 @@ def apply_style() -> None:
             .metric-value {{ font-size: 1.28rem; }}
             .result-value {{ font-size: 2.15rem; }}
             .result-box {{ grid-template-columns: 1fr; gap: 1rem; }}
+            .input-label {{ min-height: auto; }}
             label, .stNumberInput label, .stFileUploader label {{ min-height: auto; }}
         }}
         </style>
@@ -217,6 +231,11 @@ def metric_card(label: str, value: str, accent: str = PRIMARY, note: str | None 
         """,
         unsafe_allow_html=True,
     )
+
+
+def labeled_number_input(label_html: str, key: str, *args, **kwargs):
+    st.markdown(f"<div class='input-label'>{label_html}</div>", unsafe_allow_html=True)
+    return st.number_input(" ", *args, key=key, label_visibility="collapsed", **kwargs)
 
 
 def risk_label(value_mg_l: float, threshold: float) -> tuple[str, str]:
@@ -346,7 +365,10 @@ def batch_predict(bundle: dict, df: pd.DataFrame) -> tuple[pd.DataFrame, list[st
 
 def render_single_prediction(bundle: dict) -> None:
     st.subheader("Single prediction")
-    st.caption("Current-hour N₂O soft sensing using current process values and recent N₂O history.")
+    st.markdown(
+        f"<div class='small-note'>Current-hour {N2O_HTML} soft sensing using current process values and recent {N2O_HTML} history.</div>",
+        unsafe_allow_html=True,
+    )
 
     with st.form("single_prediction_form"):
         st.markdown(f"#### {N2O_HTML} history", unsafe_allow_html=True)
@@ -354,42 +376,42 @@ def render_single_prediction(bundle: dict) -> None:
         target = bundle["target"]
         med_n2o = default_raw(bundle, target)
         with c1:
-            n2o_lag1 = st.number_input("N₂O, t−1 h", 0.0, 10.0, med_n2o, 0.01)
+            n2o_lag1 = labeled_number_input("N₂O, t-1 h", "n2o_lag1h", 0.0, 10.0, med_n2o, 0.01)
         with c2:
-            n2o_lag2 = st.number_input("N₂O, t−2 h", 0.0, 10.0, med_n2o, 0.01)
+            n2o_lag2 = labeled_number_input("N₂O, t-2 h", "n2o_lag2h", 0.0, 10.0, med_n2o, 0.01)
         with c3:
-            n2o_lag3 = st.number_input("N₂O, t−3 h", 0.0, 10.0, med_n2o, 0.01)
+            n2o_lag3 = labeled_number_input("N₂O, t-3 h", "n2o_lag3h", 0.0, 10.0, med_n2o, 0.01)
         with c4:
-            n2o_roll3 = st.number_input("N₂O rolling 3 h", 0.0, 10.0, med_n2o, 0.01)
+            n2o_roll3 = labeled_number_input("N₂O rolling 3 h", "n2o_roll3h", 0.0, 10.0, med_n2o, 0.01)
         with c5:
-            n2o_roll6 = st.number_input("N₂O rolling 6 h", 0.0, 10.0, med_n2o, 0.01)
+            n2o_roll6 = labeled_number_input("N₂O rolling 6 h", "n2o_roll6h", 0.0, 10.0, med_n2o, 0.01)
 
         st.markdown("#### Nitrogen and aeration")
         c1, c2, c3, c4 = st.columns(4)
         with c1:
-            nh4 = st.number_input("NH₄⁺ (mg/L)", 0.0, 30.0, default_raw(bundle, "NH4_T1"), 0.1)
-            no3 = st.number_input("NO₃⁻ (mg/L)", 0.0, 60.0, default_raw(bundle, "NO3_T1"), 0.1)
+            nh4 = labeled_number_input("NH₄⁺ (mg L⁻¹)", "nh4_mg_l", 0.0, 30.0, default_raw(bundle, "NH4_T1"), 0.1)
+            no3 = labeled_number_input("NO₃⁻ (mg L⁻¹)", "no3_mg_l", 0.0, 60.0, default_raw(bundle, "NO3_T1"), 0.1)
         with c2:
-            po4 = st.number_input("PO₄³⁻ (mg/L)", 0.0, 20.0, default_raw(bundle, "PO4_T1"), 0.1)
-            o2 = st.number_input("Dissolved O₂ (mg/L)", 0.0, 10.0, default_raw(bundle, "O2_T1"), 0.05)
+            po4 = labeled_number_input("PO₄³⁻ (mg L⁻¹)", "po4_mg_l", 0.0, 20.0, default_raw(bundle, "PO4_T1"), 0.1)
+            o2 = labeled_number_input("Dissolved O₂ (mg L⁻¹)", "o2_mg_l", 0.0, 10.0, default_raw(bundle, "O2_T1"), 0.05)
         with c3:
-            o2_setpoint = st.number_input("O₂ setpoint", 0.0, 5.0, default_raw(bundle, "O2_SP_T1"), 0.05)
-            airflow = st.number_input("Airflow", 0.0, 8000.0, default_raw(bundle, "AIRFLOW_T1"), 50.0)
+            o2_setpoint = labeled_number_input("O₂ setpoint", "o2_setpoint", 0.0, 5.0, default_raw(bundle, "O2_SP_T1"), 0.05)
+            airflow = labeled_number_input("Airflow", "airflow", 0.0, 8000.0, default_raw(bundle, "AIRFLOW_T1"), 50.0)
         with c4:
-            valve = st.number_input("Valve position (%)", 0.0, 100.0, default_raw(bundle, "VALVE_T1"), 1.0)
-            ss = st.number_input("Suspended solids", 0.0, 10.0, default_raw(bundle, "SS_T1"), 0.05)
+            valve = labeled_number_input("Valve position (%)", "valve_position", 0.0, 100.0, default_raw(bundle, "VALVE_T1"), 1.0)
+            ss = labeled_number_input("Suspended solids", "suspended_solids", 0.0, 10.0, default_raw(bundle, "SS_T1"), 0.05)
 
         st.markdown("#### Load, temperature and time")
         c1, c2, c3, c4 = st.columns(4)
         with c1:
-            temperature = st.number_input("Temperature (°C)", 0.0, 40.0, default_raw(bundle, "TEMP_T1"), 0.1)
+            temperature = labeled_number_input("Temperature (°C)", "temperature_c", 0.0, 40.0, default_raw(bundle, "TEMP_T1"), 0.1)
         with c2:
-            influent_q = st.number_input("Influent Q", 0.0, 15000.0, default_raw(bundle, "INLET_Q"), 50.0)
+            influent_q = labeled_number_input("Influent Q", "influent_q", 0.0, 15000.0, default_raw(bundle, "INLET_Q"), 50.0)
         with c3:
-            stormwater_flow = st.number_input("Stormwater flow", 0.0, 2.0, default_raw(bundle, "SWM_INLET_FLOW"), 0.05)
+            stormwater_flow = labeled_number_input("Stormwater flow", "stormwater_flow", 0.0, 2.0, default_raw(bundle, "SWM_INLET_FLOW"), 0.05)
         with c4:
-            hour = st.number_input("Hour of day", 0, 23, 12, 1)
-            day_of_year = st.number_input("Day of year", 1, 366, 180, 1)
+            hour = labeled_number_input("Hour of day", "hour_of_day", 0, 23, 12, 1)
+            day_of_year = labeled_number_input("Day of year", "day_of_year", 1, 366, 180, 1)
 
         submitted = st.form_submit_button("Predict N₂O", type="primary", use_container_width=True)
 

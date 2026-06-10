@@ -96,9 +96,9 @@ def apply_style() -> None:
             min-height: 78px;
             box-shadow: 0 6px 18px rgba(36,50,63,0.045);
         }}
-        .metric-label {{ color: {MUTED}; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.035em; line-height: 1.22; }}
-        .metric-value {{ color: {INK}; font-size: 1.34rem; font-weight: 800; margin-top: 0.16rem; line-height: 1.12; }}
-        .small-note {{ color: {MUTED}; font-size: 0.8rem; line-height: 1.38; margin: 0.04rem 0 0.1rem 0; }}
+        .metric-label {{ color: {MUTED}; font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.035em; line-height: 1.22; }}
+        .metric-value {{ color: {INK}; font-size: 1.42rem; font-weight: 800; margin-top: 0.16rem; line-height: 1.12; }}
+        .small-note {{ color: {MUTED}; font-size: 0.84rem; line-height: 1.4; margin: 0.04rem 0 0.1rem 0; }}
         .result-box {{
             background: white;
             border: 1px solid rgba(36,50,63,0.08);
@@ -115,7 +115,7 @@ def apply_style() -> None:
         .result-message {{
             border-radius: 8px;
             padding: 0.78rem 0.92rem;
-            font-size: 0.9rem;
+            font-size: 0.96rem;
             line-height: 1.42;
             font-weight: 500;
         }}
@@ -147,9 +147,9 @@ def apply_style() -> None:
         .pill-high {{ background: #FBECEA; color: #A63C32; }}
         .pill-caution {{ background: #FFF4D7; color: #8B6B1D; }}
         div[data-testid="stMetricValue"] {{ font-weight: 800; color: {INK}; }}
-        h2 {{ color: {INK}; font-size: 1.2rem !important; line-height: 1.22 !important; padding-bottom: 0 !important; margin: 0.34rem 0 0.08rem 0 !important; }}
-        h3 {{ color: {INK}; font-size: 1rem !important; line-height: 1.25 !important; margin-top: 0.48rem !important; }}
-        h4 {{ color: {INK}; font-size: 0.95rem !important; line-height: 1.2 !important; margin: 0.46rem 0 0.16rem 0 !important; }}
+        h2 {{ color: {INK}; font-size: 1.26rem !important; line-height: 1.22 !important; padding-bottom: 0 !important; margin: 0.34rem 0 0.08rem 0 !important; }}
+        h3 {{ color: {INK}; font-size: 1.06rem !important; line-height: 1.25 !important; margin-top: 0.48rem !important; }}
+        h4 {{ color: {INK}; font-size: 1rem !important; line-height: 1.2 !important; margin: 0.46rem 0 0.16rem 0 !important; }}
         label, .stNumberInput label, .stFileUploader label {{
             color: {INK} !important;
             font-size: 0.82rem !important;
@@ -160,7 +160,7 @@ def apply_style() -> None:
             align-items: flex-end !important;
         }}
         .stNumberInput input {{
-            font-size: 0.92rem !important;
+            font-size: 0.98rem !important;
             min-height: 2.18rem;
         }}
         div[data-testid="stNumberInput"] label {{

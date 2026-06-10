@@ -131,7 +131,7 @@ def apply_style() -> None:
             min-height: 1.05rem;
             display: flex;
             align-items: flex-end;
-            margin: 0.02rem 0 0.08rem 0;
+            margin: 0.02rem 0 0.62rem 0;
         }}
         .input-label sub, .input-label sup {{
             font-size: 0.72em;
@@ -170,7 +170,7 @@ def apply_style() -> None:
             padding: 0 !important;
         }}
         div[data-testid="stNumberInput"] {{
-            margin-top: -0.45rem;
+            margin-top: 0 !important;
         }}
         div[data-testid="stCaptionContainer"] {{
             color: {MUTED};

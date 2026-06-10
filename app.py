@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from html import escape
 from io import BytesIO
 from pathlib import Path
 
@@ -23,6 +24,13 @@ INK = "#24323F"
 MUTED = "#657487"
 BG = "#F6F8F7"
 
+N2O_HTML = "N<sub>2</sub>O"
+O2_HTML = "O<sub>2</sub>"
+NH4_HTML = "NH<sub>4</sub><sup>+</sup>"
+NO3_HTML = "NO<sub>3</sub><sup>-</sup>"
+PO4_HTML = "PO<sub>4</sub><sup>3-</sup>"
+R2_HTML = "R<sup>2</sup>"
+
 
 st.set_page_config(page_title=PAGE_TITLE, page_icon=":chart_with_upwards_trend:", layout="wide")
 
@@ -33,23 +41,46 @@ def apply_style() -> None:
         <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         html, body, [class*="css"] {{ font-family: Inter, sans-serif; }}
+        sub, sup {{
+            font-size: 0.68em;
+            line-height: 0;
+            position: relative;
+            vertical-align: baseline;
+        }}
+        sub {{ bottom: -0.28em; }}
+        sup {{ top: -0.46em; }}
         .stApp {{ background: {BG}; }}
-        .block-container {{ padding-top: 1.8rem; padding-bottom: 3rem; max-width: 1240px; }}
+        .block-container {{ padding-top: 1.55rem; padding-bottom: 3rem; max-width: 1320px; }}
         .hero {{
             background: linear-gradient(135deg, #173F45 0%, #2F6F73 52%, #5EA7A3 100%);
             color: white;
-            padding: 2rem 2.3rem;
+            padding: 1.75rem 2.1rem;
             border-radius: 10px;
-            margin-bottom: 1.4rem;
+            margin-bottom: 1.15rem;
             box-shadow: 0 18px 45px rgba(24, 66, 72, 0.18);
         }}
-        .hero h1 {{ font-size: 2.25rem; line-height: 1.12; margin: 0 0 0.45rem 0; font-weight: 800; letter-spacing: 0; }}
-        .hero p {{ margin: 0; color: rgba(255,255,255,0.88); font-size: 1rem; line-height: 1.55; max-width: 880px; }}
+        .hero h1 {{
+            color: #FFFFFF !important;
+            font-size: 2.08rem;
+            line-height: 1.12;
+            margin: 0 0 0.42rem 0;
+            font-weight: 800;
+            letter-spacing: 0;
+        }}
+        .hero h1 sub, .hero h1 sup {{ color: #FFFFFF !important; }}
+        .hero p {{
+            margin: 0;
+            color: rgba(255,255,255,0.92) !important;
+            font-size: 0.98rem;
+            line-height: 1.5;
+            max-width: 920px;
+        }}
+        .hero p sub, .hero p sup {{ color: rgba(255,255,255,0.92) !important; }}
         .card {{
             background: white;
             border: 1px solid rgba(36,50,63,0.08);
             border-radius: 8px;
-            padding: 1rem 1.1rem;
+            padding: 0.95rem 1.05rem;
             box-shadow: 0 8px 26px rgba(36,50,63,0.06);
         }}
         .metric-card {{
@@ -57,65 +88,88 @@ def apply_style() -> None:
             border: 1px solid rgba(36,50,63,0.08);
             border-left: 4px solid {PRIMARY};
             border-radius: 8px;
-            padding: 0.85rem 1rem;
-            min-height: 98px;
+            padding: 0.78rem 0.95rem;
+            min-height: 92px;
             box-shadow: 0 8px 24px rgba(36,50,63,0.05);
         }}
         .metric-label {{ color: {MUTED}; font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; line-height: 1.25; }}
-        .metric-value {{ color: {INK}; font-size: 1.55rem; font-weight: 800; margin-top: 0.24rem; line-height: 1.15; }}
-        .small-note {{ color: {MUTED}; font-size: 0.84rem; line-height: 1.45; margin-top: 0.12rem; }}
+        .metric-value {{ color: {INK}; font-size: 1.46rem; font-weight: 800; margin-top: 0.22rem; line-height: 1.14; }}
+        .small-note {{ color: {MUTED}; font-size: 0.82rem; line-height: 1.42; margin-top: 0.1rem; }}
         .result-box {{
             background: white;
             border: 1px solid rgba(36,50,63,0.08);
             border-radius: 8px;
-            padding: 1.2rem 1.35rem;
+            padding: 1.05rem 1.2rem;
             box-shadow: 0 10px 30px rgba(36,50,63,0.07);
+            display: grid;
+            grid-template-columns: minmax(210px, 0.85fr) minmax(300px, 1.55fr);
+            gap: 1.35rem;
+            align-items: start;
         }}
-        .result-value {{ font-size: 2.7rem; color: {PRIMARY}; font-weight: 800; line-height: 1; margin-top: 0.25rem; }}
+        .result-text {{ color: {INK}; font-size: 0.94rem; line-height: 1.45; margin: 0 0 0.72rem 0; }}
+        .threshold-value {{ color: {INK}; font-size: 2.05rem; font-weight: 800; line-height: 1.05; margin: 0.2rem 0 0.95rem 0; }}
+        .result-message {{
+            border-radius: 8px;
+            padding: 0.78rem 0.92rem;
+            font-size: 0.9rem;
+            line-height: 1.42;
+            font-weight: 500;
+        }}
+        .result-message-ok {{ background: #E7F5EF; color: #23734E; }}
+        .result-message-warn {{ background: #FFF4D7; color: #735817; }}
+        .result-value {{ font-size: 2.55rem; color: {PRIMARY}; font-weight: 800; line-height: 1; margin-top: 0.22rem; }}
+        .result-unit {{ color: {MUTED}; font-size: 0.96rem; font-weight: 700; line-height: 1.25; margin: 0.22rem 0 0.55rem 0; }}
         .status-pill {{
             display: inline-block;
-            padding: 0.35rem 0.68rem;
+            padding: 0.32rem 0.62rem;
             border-radius: 999px;
             font-weight: 700;
-            font-size: 0.84rem;
+            font-size: 0.82rem;
         }}
         .pill-normal {{ background: #E7F5EF; color: #23734E; }}
         .pill-high {{ background: #FBECEA; color: #A63C32; }}
         .pill-caution {{ background: #FFF4D7; color: #8B6B1D; }}
         div[data-testid="stMetricValue"] {{ font-weight: 800; color: {INK}; }}
-        h2 {{ color: {INK}; font-size: 1.35rem !important; line-height: 1.25 !important; padding-bottom: 0.15rem !important; }}
-        h3 {{ color: {INK}; font-size: 1.05rem !important; line-height: 1.3 !important; margin-top: 0.8rem !important; }}
-        h4 {{ color: {INK}; font-size: 0.96rem !important; line-height: 1.25 !important; margin: 0.75rem 0 0.35rem 0 !important; }}
+        h2 {{ color: {INK}; font-size: 1.28rem !important; line-height: 1.25 !important; padding-bottom: 0.1rem !important; }}
+        h3 {{ color: {INK}; font-size: 1.02rem !important; line-height: 1.28 !important; margin-top: 0.72rem !important; }}
+        h4 {{ color: {INK}; font-size: 0.94rem !important; line-height: 1.22 !important; margin: 0.62rem 0 0.28rem 0 !important; }}
         label, .stNumberInput label, .stFileUploader label {{
             color: {INK} !important;
-            font-size: 0.86rem !important;
+            font-size: 0.82rem !important;
             font-weight: 650 !important;
-            line-height: 1.25 !important;
+            line-height: 1.18 !important;
+            min-height: 1.95rem;
+            display: flex !important;
+            align-items: flex-end !important;
         }}
         .stNumberInput input {{
-            font-size: 0.94rem !important;
-            min-height: 2.4rem;
+            font-size: 0.9rem !important;
+            min-height: 2.24rem;
         }}
         div[data-testid="stCaptionContainer"] {{
             color: {MUTED};
-            font-size: 0.88rem;
-            line-height: 1.45;
+            font-size: 0.84rem;
+            line-height: 1.42;
         }}
         div[data-testid="stTabs"] button p {{
-            font-size: 0.95rem;
+            font-size: 0.92rem;
             font-weight: 700;
         }}
         div[data-testid="stForm"] {{
             background: white;
             border: 1px solid rgba(36,50,63,0.08);
             border-radius: 8px;
-            padding: 0.95rem 1.05rem 1.1rem 1.05rem;
+            padding: 0.82rem 0.96rem 1rem 0.96rem;
             box-shadow: 0 8px 24px rgba(36,50,63,0.05);
+        }}
+        div[data-testid="stHorizontalBlock"] {{
+            gap: 0.95rem;
         }}
         .stButton > button, .stDownloadButton > button {{
             border-radius: 8px;
             font-weight: 700;
             border: 1px solid rgba(36,50,63,0.14);
+            min-height: 2.35rem;
         }}
         .stButton > button[kind="primary"] {{
             background: {PRIMARY};
@@ -128,8 +182,10 @@ def apply_style() -> None:
             .block-container {{ padding-top: 1rem; }}
             .hero {{ padding: 1.35rem 1.25rem; }}
             .hero h1 {{ font-size: 1.65rem; }}
-            .metric-value {{ font-size: 1.35rem; }}
-            .result-value {{ font-size: 2.25rem; }}
+            .metric-value {{ font-size: 1.28rem; }}
+            .result-value {{ font-size: 2.15rem; }}
+            .result-box {{ grid-template-columns: 1fr; gap: 1rem; }}
+            label, .stNumberInput label, .stFileUploader label {{ min-height: auto; }}
         }}
         </style>
         """,
@@ -293,7 +349,7 @@ def render_single_prediction(bundle: dict) -> None:
     st.caption("Current-hour N₂O soft sensing using current process values and recent N₂O history.")
 
     with st.form("single_prediction_form"):
-        st.markdown("#### N₂O history")
+        st.markdown(f"#### {N2O_HTML} history", unsafe_allow_html=True)
         c1, c2, c3, c4, c5 = st.columns(5)
         target = bundle["target"]
         med_n2o = default_raw(bundle, target)
@@ -367,21 +423,32 @@ def render_single_prediction(bundle: dict) -> None:
     label, pill_class = risk_label(pred, threshold)
     domain_warnings = check_domain(bundle, guided)
 
-    st.markdown("<div class='result-box'>", unsafe_allow_html=True)
-    left, right = st.columns([1.2, 2])
-    with left:
-        st.markdown("<div class='metric-label'>Predicted dissolved N₂O</div>", unsafe_allow_html=True)
-        st.markdown(f"<div class='result-value'>{pred:.3f}</div>", unsafe_allow_html=True)
-        st.caption("mg/L")
-        st.markdown(f"<span class='status-pill {pill_class}'>{label}</span>", unsafe_allow_html=True)
-    with right:
-        st.write("The threshold is the 95th percentile of the training-period N₂O distribution.")
-        st.metric("High-emission threshold", f"{threshold:.3f} mg/L")
-        if domain_warnings:
-            st.warning("Applicability-domain warnings:\n\n" + "\n".join(f"- {w}" for w in domain_warnings))
-        else:
-            st.success("Inputs are within the training 1-99% range for the displayed process variables.")
-    st.markdown("</div>", unsafe_allow_html=True)
+    if domain_warnings:
+        message_class = "result-message-warn"
+        message = "Applicability-domain warnings:<br>" + "<br>".join(f"- {escape(w)}" for w in domain_warnings)
+    else:
+        message_class = "result-message-ok"
+        message = "Inputs are within the training 1-99% range for the displayed process variables."
+
+    st.markdown(
+        f"""
+        <div class="result-box">
+            <div>
+                <div class="metric-label">Predicted dissolved {N2O_HTML}</div>
+                <div class="result-value">{pred:.3f}</div>
+                <div class="result-unit">mg L<sup>-1</sup></div>
+                <span class="status-pill {pill_class}">{label}</span>
+            </div>
+            <div>
+                <p class="result-text">The threshold is the 95th percentile of the training-period {N2O_HTML} distribution.</p>
+                <div class="metric-label">High-emission threshold</div>
+                <div class="threshold-value">{threshold:.3f} mg L<sup>-1</sup></div>
+                <div class="result-message {message_class}">{message}</div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 def render_batch_prediction(bundle: dict) -> None:
@@ -445,19 +512,20 @@ def render_model_info(bundle: dict) -> None:
     test = bundle["test_metrics"]
     c1, c2, c3, c4 = st.columns(4)
     with c1:
-        metric_card("Test R²", fmt(test["r2"], 3), BLUE)
+        metric_card(f"Test {R2_HTML}", fmt(test["r2"], 3), BLUE)
     with c2:
-        metric_card("Test RMSE", fmt(test["rmse"], 3), TEAL, "log1p(N₂O)")
+        metric_card("Test RMSE", fmt(test["rmse"], 3), TEAL, f"log1p({N2O_HTML})")
     with c3:
-        metric_card("Test MAE", fmt(test["mae"], 3), GOLD, "log1p(N₂O)")
+        metric_card("Test MAE", fmt(test["mae"], 3), GOLD, f"log1p({N2O_HTML})")
     with c4:
         metric_card("Train rows", f"{bundle['training_rows']:,}", CORAL)
 
     st.markdown("#### Scientific scope")
-    st.write(
-        "This app is a current-hour soft sensor for dissolved N₂O at Avedore WWTP. "
+    st.markdown(
+        f"This app is a current-hour soft sensor for dissolved {N2O_HTML} at Avedore WWTP. "
         "It follows the manuscript feature engineering and uses the regularized HGB model. "
-        "Predictions rely strongly on recent N₂O history, so missing or unrealistic history inputs reduce reliability."
+        f"Predictions rely strongly on recent {N2O_HTML} history, so missing or unrealistic history inputs reduce reliability.",
+        unsafe_allow_html=True,
     )
     st.markdown("#### Caveats")
     for caveat in bundle["caveats"]:
@@ -474,8 +542,8 @@ def main() -> None:
     st.markdown(
         """
         <div class="hero">
-            <h1>N₂O Soft Sensor for Wastewater Treatment</h1>
-            <p>Current-hour dissolved N₂O prediction using a leakage-audited machine-learning model trained on full-scale hourly data.</p>
+            <h1>N<sub>2</sub>O Soft Sensor for Wastewater Treatment</h1>
+            <p>Current-hour dissolved N<sub>2</sub>O prediction using a leakage-audited machine-learning model trained on full-scale hourly data.</p>
         </div>
         """,
         unsafe_allow_html=True,
@@ -485,9 +553,9 @@ def main() -> None:
     with c1:
         metric_card("Model", "Regularized HGB", PRIMARY)
     with c2:
-        metric_card("Hold-out R²", fmt(bundle["test_metrics"]["r2"], 3), BLUE)
+        metric_card(f"Hold-out {R2_HTML}", fmt(bundle["test_metrics"]["r2"], 3), BLUE)
     with c3:
-        metric_card("High-emission threshold", f"{bundle['high_emission_threshold_mg_l']:.3f} mg/L", CORAL)
+        metric_card("High-emission threshold", f"{bundle['high_emission_threshold_mg_l']:.3f} mg L<sup>-1</sup>", CORAL)
 
     tab1, tab2, tab3 = st.tabs(["Prediction", "Batch upload", "Model information"])
     with tab1:
